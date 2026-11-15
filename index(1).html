@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Museo Galáctico · SPHEREx y Planeta X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080f;--panel:#0d0f1a;--line:#23253a;--ink:#e8e2d4;--mute:#8d8a9c;--gold:#c9a96e;--gold2:#e6cf9f;
+--serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;--sans:'Inter',system-ui,'Segoe UI',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;overflow-x:hidden}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+header.top{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;
+  padding:16px 28px;background:linear-gradient(#07080fe6,#07080f00)}
+.brand{font-family:var(--serif);font-size:1.15rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold2)}
+header.top a{color:var(--mute);text-decoration:none;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;margin-left:22px}
+header.top a:hover{color:var(--gold2)}
+main{position:relative;z-index:1}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:100px 24px 60px}
+.eyebrow{font-size:.75rem;letter-spacing:.35em;text-transform:uppercase;color:var(--gold)}
+.hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,8vw,6rem);line-height:1.02;margin:22px 0;max-width:14ch}
+.hero h1 em{color:var(--gold2)}
+.hero p{max-width:560px;color:var(--mute);font-size:1.02rem}
+.btn{display:inline-block;margin-top:34px;padding:13px 30px;border:1px solid var(--gold);color:var(--gold2);background:none;
+  font:500 .78rem var(--sans);letter-spacing:.25em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:.25s}
+.btn:hover{background:var(--gold);color:#07080f}
+.sala{max-width:1180px;margin:0 auto;padding:80px 28px 20px}
+.sala-head{display:flex;gap:22px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:28px}
+.roman{font-family:var(--serif);font-size:2.6rem;color:var(--gold)}
+.sala-head h2{font-family:var(--serif);font-weight:400;font-size:1.9rem}
+.sala-head p{color:var(--mute);font-size:.9rem;margin-top:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px}
+.piece{background:var(--panel);border:1px solid var(--line);cursor:pointer;transition:.3s;display:flex;flex-direction:column}
+.piece:hover,.piece:focus-visible{border-color:var(--gold);transform:translateY(-4px);outline:none}
+.art{height:200px;position:relative;overflow:hidden;background:var(--g)}
+.art::after{content:"";position:absolute;inset:14px;border:1px solid #ffffff22}
+.cedula{padding:18px 20px 22px}
+.cedula small{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.cedula h3{font-family:var(--serif);font-weight:600;font-size:1.45rem;margin:6px 0 8px}
+.cedula p{color:var(--mute);font-size:.86rem}
+.cedula .go{display:inline-block;margin-top:14px;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold2)}
+footer{position:relative;z-index:1;text-align:center;color:var(--mute);font-size:.78rem;padding:70px 24px 50px;max-width:700px;margin:0 auto}
+footer b{color:var(--gold2);font-weight:500}
+
+/* Sala de observación */
+#room{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;grid-template-columns:1fr 390px}
+#room.open{display:grid}
+.viewer{position:relative;height:100%;min-height:0}
+#aladin{position:absolute;inset:0}
+#aladin-msg{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;text-align:center;padding:30px;color:var(--mute);z-index:2;background:var(--bg);pointer-events:none}
+#aladin-msg.hide{display:none}
+#lite{position:absolute;inset:0;background:#000;overflow:hidden}
+#lite[hidden]{display:none}
+#lite img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+#lite-load{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:var(--mute);font-size:.85rem;z-index:2;pointer-events:none}
+#lite-load[hidden]{display:none}
+#lite-note{position:absolute;left:14px;top:14px;right:14px;z-index:3;font-size:.72rem;color:#c9b98a;background:#0d0f1ae6;border:1px dashed #5a4a28;padding:8px 10px}
+#lite-ctl{position:absolute;right:14px;bottom:14px;display:grid;grid-template-columns:repeat(3,44px);gap:6px;z-index:3}
+#lite-ctl button{width:44px;height:44px;background:#0d0f1ae6;border:1px solid var(--line);color:var(--gold2);font-size:1.15rem;cursor:pointer}
+#lite-ctl button:hover{border-color:var(--gold)}
+#aladin-msg .b{width:auto;pointer-events:auto}
+.placard{background:var(--panel);border-left:1px solid var(--line);padding:26px 26px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:18px}
+.placard .row{display:flex;justify-content:space-between;align-items:center}
+.x{background:none;border:1px solid var(--line);color:var(--ink);width:34px;height:34px;cursor:pointer;font-size:1rem}
+.x:hover{border-color:var(--gold);color:var(--gold2)}
+.placard h2{font-family:var(--serif);font-weight:600;font-size:2rem;line-height:1.1}
+.tipo{font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold)}
+.curatorial{font-family:var(--serif);font-size:1.12rem;font-style:italic;color:#cfc8b8}
+.ficha{font-size:.78rem;color:var(--mute);border-top:1px solid var(--line);padding-top:12px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px}
+.ficha dt{color:var(--gold)}
+.ficha dd{font-family:ui-monospace,Consolas,monospace;color:var(--ink)}
+.datos dd{font-family:var(--sans);font-size:.82rem}
+.resumen{font-size:.86rem;color:#cfc8b8}
+.ref{font-size:.72rem;color:var(--mute);font-style:italic;border-top:1px solid var(--line);padding-top:10px}
+.ctrl{border-top:1px solid var(--line);padding-top:14px}
+.ctrl h4{font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;font-weight:500}
+select,.b{width:100%;padding:10px 12px;margin-bottom:8px;background:#0a0c16;border:1px solid var(--line);color:var(--ink);font:400 .84rem var(--sans);text-align:left;cursor:pointer}
+.b:hover,select:hover{border-color:var(--gold)}
+.b.on{border-color:#d9534f;color:#ffb4b0}
+input[type=range]{width:100%;accent-color:var(--gold)}
+.badge{font-size:.75rem;color:var(--gold2);margin-top:6px}
+.nav{display:flex;gap:8px;margin-top:auto}
+.nav .b{text-align:center;margin:0}
+.proto{font-size:.7rem;color:#a98e55;border:1px dashed #5a4a28;padding:8px 10px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:var(--panel);border:1px solid var(--gold);
+  padding:10px 18px;font-size:.84rem;opacity:0;pointer-events:none;transition:.3s;z-index:100}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:860px){
+  header.top a{display:none}
+  #room.open{grid-template-columns:1fr;grid-template-rows:48vh 1fr}
+  .placard{border-left:0;border-top:1px solid var(--line)}
+}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+<header class="top">
+  <div class="brand">Museo Galáctico</div>
+  <nav><a href="#sala1">Sala I</a><a href="#sala2">Sala II</a><a href="#sala3">Sala III</a></nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="eyebrow">Exposición permanente · NASA SPHEREx</div>
+    <h1>El cielo <em>cambia</em> si sabes mirarlo</h1>
+    <p>Recorre las salas, compara el mismo rincón del universo en distintas épocas y descubre qué se mueve, qué parpadea y qué se esconde en el infrarrojo.</p>
+    <a class="btn" href="#sala1">Entrar a las salas</a>
+  </section>
+
+  <section class="sala" id="sala1">
+    <div class="sala-head"><div class="roman">I</div><div><h2>Sala del Movimiento</h2><p>Estrellas que no se quedan quietas</p></div></div>
+    <div class="grid" id="g1"></div>
+  </section>
+  <section class="sala" id="sala2">
+    <div class="sala-head"><div class="roman">II</div><div><h2>Sala de los Mundos Fríos</h2><p>Enanas marrones, casi planetas</p></div></div>
+    <div class="grid" id="g2"></div>
+  </section>
+  <section class="sala" id="sala3">
+    <div class="sala-head"><div class="roman">III</div><div><h2>Sala del Pulso</h2><p>Estrellas que respiran en el tiempo</p></div></div>
+    <div class="grid" id="g3"></div>
+  </section>
+
+  <footer>
+    <b>Prototipo.</b> Las épocas que se comparan hoy provienen de DSS2, 2MASS y AllWISE.
+    La capa con datos de SPHEREx, obtenidos vía IRSA, se integrará en la siguiente fase.
+  </footer>
+</main>
+
+<!-- Sala de observación -->
+<div id="room" role="dialog" aria-modal="true" aria-label="Sala de observación">
+  <div class="viewer"><div id="aladin"></div>
+    <div id="lite" hidden>
+      <img id="img-base" alt=""><img id="img-over" alt="">
+      <div id="lite-load">Cargando imágenes del cielo…</div>
+      <div id="lite-note"><span id="lite-msg"></span> <button class="b" id="retry2" style="width:auto;display:inline-block;margin:6px 0 0;padding:6px 10px">Reintentar visor interactivo</button></div>
+      <div id="lite-ctl">
+        <button data-m="zi" aria-label="Acercar">+</button><button data-m="up" aria-label="Norte">↑</button><button data-m="zo" aria-label="Alejar">−</button>
+        <button data-m="lf" aria-label="Este">←</button><span></span><button data-m="rt" aria-label="Oeste">→</button>
+        <span></span><button data-m="dn" aria-label="Sur">↓</button><span></span>
+      </div>
+    </div><div id="aladin-msg"><div id="aladin-msg-t">Cargando el cielo…</div><button class="b" id="retry" hidden>Reintentar</button></div></div>
+  <aside class="placard">
+    <div class="row"><span class="tipo" id="p-sala"></span><button class="x" id="close" aria-label="Cerrar">✕</button></div>
+    <div><div class="tipo" id="p-tipo"></div><h2 id="p-name"></h2></div>
+    <p class="curatorial" id="p-text"></p>
+    <dl class="ficha datos" id="p-datos"></dl>
+    <p class="resumen" id="p-resumen"></p>
+    <p class="ref" id="p-ref"></p>
+    <dl class="ficha">
+      <dt>RA</dt><dd id="p-ra"></dd><dt>Dec</dt><dd id="p-dec"></dd>
+      <dt>Vista</dt><dd id="p-live">—</dd>
+    </dl>
+    <div class="ctrl">
+      <h4>Comparador temporal</h4>
+      <select id="pair" aria-label="Par de épocas">
+        <option value="0">2MASS (~2000) ↔ AllWISE (~2010)</option>
+        <option value="1">DSS2 (~1990) ↔ 2MASS (~2000)</option>
+      </select>
+      <button class="b" id="blink">▶ Parpadeo (blink)</button>
+      <input type="range" id="mix" min="0" max="1" step="0.05" value="0.5" aria-label="Mezcla de épocas">
+      <div class="badge" id="badge">Mezcla 50 / 50</div>
+    </div>
+    <div class="proto" id="p-note"></div>
+    <button class="b" id="share">🔗 Copiar enlace de esta vista</button>
+    <div class="nav"><button class="b" id="prev">← Anterior</button><button class="b" id="next">Siguiente →</button></div>
+  </aside>
+</div>
+<div id="toast"></div>
+
+<script>
+const PAIRS=[
+ {base:'P/2MASS/color',over:'P/allWISE/color',l1:'Época 1 · 2MASS (~2000)',l2:'Época 2 · AllWISE (~2010)',s1:'2MASS',s2:'WISE'},
+ {base:'P/DSS2/color',over:'P/2MASS/color',l1:'Época 1 · DSS2 (~1990)',l2:'Época 2 · 2MASS (~2000)',s1:'DSS2',s2:'2MASS'}];
+const EX=[
+ {id:'barnard',sala:1,tipo:'Movimiento propio',name:'Estrella de Barnard',ra:269.452,dec:4.693,fov:.15,pair:1,
+  g:'radial-gradient(circle at 60% 40%,#ff9966 0 3%,transparent 4%),radial-gradient(circle at 30% 70%,#3a1f4a,#07080f 70%)',
+  blurb:'La estrella con mayor movimiento propio conocido.',
+  text:'Se desplaza unos 10 segundos de arco por año. Activa el parpadeo y verás cómo salta entre épocas mientras el fondo permanece inmóvil.',
+  note:'Mejor caso para ver movimiento hoy con datos de archivo.',ficha:[["Clase", "Enana roja tipo M"], ["Distancia", "1.83 pc (5.96 años luz)"], ["Descubrimiento", "1916 (identificación de su gran movimiento propio)"], ["Temperatura", "≈3,195–3,271 K"], ["Tipo espectral", "M3.5–M4 V"], ["Constelación", "Ofiuco"], ["Masa", "≈0.16 masas solares"]],resumen:"Estrella de secuencia principal.",ref:"NASA (2018). Barnard's Star."},
+ {id:'wise0855',sala:2,tipo:'Enana marrón',name:'WISE 0855−0714',ra:133.795,dec:-7.245,fov:.05,pair:0,
+  g:'radial-gradient(circle at 50% 55%,#5b7bd5 0 2%,transparent 3%),radial-gradient(circle at 50% 50%,#10224a,#07080f 70%)',
+  blurb:'Uno de los objetos más fríos conocidos, casi tan frío como el hielo.',
+  text:'Tan tenue que casi solo se ve en el infrarrojo medio. Un candidato ideal para probar lo que SPHEREx puede revelar.',
+  note:'No aparece en 2MASS ni AllWISE: su movimiento se verá con datos de SPHEREx o unWISE.',ficha:[["Clase", "Enana marrón tipo Y"], ["Distancia", "2.2–2.3 pc (7.2–7.5 años luz)"], ["Descubrimiento", "2014"], ["Temperatura", "225–260 K"], ["Tipo", "Objeto subestelar de masa planetaria, aislado"], ["Constelación", "Hidra"]],resumen:"Temperatura extremadamente baja; atmósfera con agua, metano y posiblemente nubes de hielo.",ref:"Beamín, J. C., et al. (2014). Temperature constraints on the coldest brown dwarf known: WISE 0855-0714. Astronomy & Astrophysics."},
+ {id:'epsindib',sala:2,tipo:'Sistema de enanas marrones',name:'Epsilon Indi Ba/Bb',ra:331.044,dec:-56.783,fov:.1,pair:0,
+  g:'radial-gradient(circle at 42% 50%,#c97b4a 0 2.5%,transparent 3.5%),radial-gradient(circle at 58% 52%,#a05a3a 0 2%,transparent 3%),radial-gradient(circle at 50% 50%,#2a1520,#07080f 70%)',
+  blurb:'Un par de enanas marrones que orbitan a una estrella cercana.',
+  text:'Dos mundos a medio camino entre planeta y estrella, a pocos años luz de nosotros. Su movimiento propio es lo bastante alto para notarse entre épocas.',
+  note:'Verifica las coordenadas en SIMBAD antes de la demo.',ficha:[["Clase", "Sistema binario de enanas marrones"], ["Distancia", "≈3.64 pc (11.9 años luz)"], ["Descubrimiento", "2003"], ["Temperatura", "Ba: 1,300–1,340 K · Bb: 880–940 K"], ["Tipos espectrales", "T1 y T6"], ["Constelación", "Indus"]],resumen:"Formado por dos enanas marrones, Epsilon Indi Ba y Epsilon Indi Bb, dos componentes subestelares con diferentes temperaturas y tipos espectrales.",ref:"King, R. R., et al. (2010). Epsilon Indi Ba, Bb: A detailed study of the nearest known brown dwarfs."},
+ {id:'rwaur',sala:3,tipo:'Estrella variable',name:'RW Aurigae',ra:76.956,dec:30.401,fov:.1,pair:0,
+  g:'radial-gradient(circle at 50% 50%,#ffd27a 0 4%,#ff8f4a22 12%,transparent 30%),radial-gradient(circle at 50% 50%,#1a1630,#07080f 75%)',
+  blurb:'Una joven estrella cuyo brillo se apaga y enciende.',
+  text:'Cambia de brillo, no de lugar. Compara las épocas y observa cómo cambia su intensidad.',
+  note:'Variable: busca diferencias de brillo, no de posición.',ficha:[["Clase", "Estrella variable joven"], ["Distancia", "≈185 pc (603 años luz)"], ["Identificada como T Tauri", "1945"], ["Temperatura", "5,040 K (RW Aur A, estimación publicada)"], ["Tipo espectral", "K2 ± 2"], ["Constelación", "Auriga"]],resumen:"Sistema estelar múltiple joven, de aproximadamente 3 millones de años, asociado con procesos de acreción y variabilidad de brillo.",ref:"The deep eclipses of RW Aur revisited by long-term photometric and spectroscopic monitoring."},
+ {id:'rdra',sala:3,tipo:'Estrella variable',name:'R Draconis',ra:248.177,dec:66.760,fov:.1,pair:0,
+  g:'radial-gradient(circle at 50% 50%,#ff5b4a 0 5%,#ff5b4a33 14%,transparent 34%),radial-gradient(circle at 50% 50%,#2a0f14,#07080f 75%)',
+  blurb:'Una gigante roja que late con un ciclo de cientos de días.',
+  text:'Una variable de tipo Mira: se hincha, se enfría y cambia de brillo de forma muy marcada en el infrarrojo.',
+  note:'Variable: busca diferencias de brillo, no de posición.',ficha:[["Clase", "Estrella variable tipo Mira"], ["Distancia", "≈800 pc (2,610 años luz)"], ["Descubrimiento", "No confirmado en las fuentes consultadas"], ["Temperatura", "Sin valor efectivo fiable confirmado"], ["Tipo espectral", "M4.5–M6, con líneas de emisión"], ["Constelación", "Draco"]],resumen:"Gigante pulsante de la rama asintótica cuyo brillo cambia periódicamente.",ref:"SIMBAD Astronomical Database. Registro de R Dra."}
+];
+const SALAS={1:'Sala I · Movimiento',2:'Sala II · Mundos fríos',3:'Sala III · Pulso'};
+const $=id=>document.getElementById(id);
+const q=new URLSearchParams(location.search);
+
+/* Galería */
+EX.forEach((e,i)=>{
+  const el=document.createElement('article');
+  el.className='piece';el.tabIndex=0;
+  el.innerHTML=`<div class="art" style="--g:${e.g}"></div><div class="cedula"><small>${e.tipo}</small><h3>${e.name}</h3><p>${e.blurb}</p><span class="go">Ver en la sala de observación →</span></div>`;
+  el.addEventListener('click',()=>openRoom(i));
+  el.addEventListener('keydown',k=>{if(k.key==='Enter'||k.key===' '){k.preventDefault();openRoom(i);}});
+  $('g'+e.sala).appendChild(el);
+});
+
+/* Campo de estrellas */
+(function(){
+  const c=$('stars'),x=c.getContext('2d');let S=[];
+  function size(){c.width=innerWidth;c.height=innerHeight;S=Array.from({length:Math.round(innerWidth*innerHeight/6000)},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.2+.2,a:Math.random()}));draw();}
+  function draw(t=0){x.clearRect(0,0,c.width,c.height);S.forEach(s=>{x.globalAlpha=.35+.45*Math.abs(Math.sin(t/2500+s.a*6));x.fillStyle='#fff';x.beginPath();x.arc(s.x,s.y,s.r,0,6.3);x.fill();});
+    if(!matchMedia('(prefers-reduced-motion: reduce)').matches)requestAnimationFrame(draw);}
+  addEventListener('resize',size);size();
+})();
+
+/* Visor: Aladin interactivo (con respaldos) y, si falla, modo ligero con imágenes hips2fits */
+const SOURCES=[
+ 'https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js',
+ 'https://aladin.u-strasbg.fr/AladinLite/api/v3/latest/aladin.js',
+ 'https://aladin.cds.unistra.fr/AladinLite/api/v3/3.6.0/aladin.js',
+ 'https://cdn.jsdelivr.net/npm/aladin-lite@3.7.3-beta/dist/aladin.js'];
+let aladin=null,ready=null,loader=null,overLayer=null,cur=0,pairIdx=0,blinkT=null,showOver=true,urlT,toastT;
+let lite=false,aladinFailed=false,lastErr='',L={ra:0,dec:0,fov:.15},liteTok=0;
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
+function msg(html,retry){$('aladin-msg').classList.remove('hide');$('aladin-msg-t').innerHTML=html;$('retry').hidden=!retry;}
+function loadScript(u){return new Promise((res,rej)=>{const el=document.createElement('script');el.src=u;el.charset='utf-8';
+  el.onload=()=>typeof A!=='undefined'?res():rej(new Error('A no definido: '+u));
+  el.onerror=()=>rej(new Error('No cargó: '+u));document.head.appendChild(el);});}
+function loadAladin(){
+  if(typeof A!=='undefined')return Promise.resolve();
+  if(loader)return loader;
+  loader=(async()=>{for(const u of SOURCES){try{await loadScript(u);return;}catch(e){console.warn('Aladin:',e.message);}}
+    loader=null;throw new Error('no se pudo descargar aladin.js');})();
+  return loader;
+}
+function setOp(v){
+  if(lite){$('img-over').style.opacity=v;return;}
+  try{if(overLayer)overLayer.setOpacity(v);}catch(e){}
+}
+function setOverlay(id){overLayer=aladin.newImageSurvey(id);aladin.setOverlayImageLayer(overLayer);}
+function initAladin(ra,dec,fov){
+  if(ready)return ready;
+  msg('Cargando el cielo…',false);
+  ready=loadAladin().then(()=>A.init).then(()=>{
+    aladin=A.aladin('#aladin',{survey:PAIRS[pairIdx].base,fov,target:`${ra} ${dec}`,showReticle:true,showZoomControl:true,showFullscreenControl:false,showLayersControl:false,showGotoControl:false});
+    setOverlay(PAIRS[pairIdx].over);setOp(.5);
+    aladin.on('positionChanged',schedUrl);aladin.on('zoomChanged',schedUrl);
+    $('aladin-msg').classList.add('hide');
+  }).catch(err=>{ready=null;lastErr=(err&&err.message)||String(err);console.error(err);throw err;});
+  return ready;
+}
+
+/* ---- Modo ligero ---- */
+const HOSTS=['alasky.cds.unistra.fr','alasky.u-strasbg.fr'];
+function liteURL(id,host){
+  const box=$('lite');
+  const W=Math.min(1000,Math.round(box.clientWidth)||800),H=Math.min(1000,Math.round(box.clientHeight)||600);
+  return 'https://'+host+'/hips-image-services/hips2fits?hips='+encodeURIComponent('CDS/'+id)
+    +`&width=${W}&height=${H}&fov=${L.fov}&projection=TAN&coordsys=icrs&rotation_angle=0.0&ra=${L.ra}&dec=${L.dec}&format=jpg`;
+}
+function liteLoad(){
+  const t=++liteTok,p=PAIRS[pairIdx];let n=0;
+  $('lite-load').hidden=false;
+  const done=()=>{if(t===liteTok&&++n>=2)$('lite-load').hidden=true;};
+  [[$('img-base'),p.base],[$('img-over'),p.over]].forEach(([el,id])=>{
+    let h=0;
+    const tryLoad=()=>{
+      const im=new Image();
+      im.onload=()=>{if(t===liteTok)el.src=im.src;done();};
+      im.onerror=()=>{
+        if(t!==liteTok)return;
+        if(++h<HOSTS.length)tryLoad();
+        else{toast('No se pudo cargar una imagen del cielo');done();}
+      };
+      im.src=liteURL(id,HOSTS[h]);
+    };
+    tryLoad();
+  });
+  setOp(parseFloat($('mix').value));schedUrl();
+}
+function liteMove(dra,ddec,zoom){
+  if(zoom)L.fov=Math.min(5,Math.max(.005,L.fov*zoom));
+  L.dec=Math.max(-89.9,Math.min(89.9,L.dec+ddec*L.fov));
+  L.ra=((L.ra+dra*L.fov/Math.max(.05,Math.cos(L.dec*Math.PI/180)))%360+360)%360;
+  liteLoad();
+}
+function enterLite(ra,dec,fov,pr){
+  lite=true;aladinFailed=true;
+  $('aladin-msg').classList.add('hide');$('aladin').hidden=true;$('lite').hidden=false;
+  L={ra,dec,fov};pairIdx=pr;$('pair').value=pr;$('mix').value=.5;mixLabel(.5);
+  $('lite-msg').textContent='Modo ligero: imágenes estáticas reales del cielo. El visor interactivo Aladin no pudo iniciarse en este navegador'+(lastErr?' ('+lastErr+')':'')+'.';
+  liteLoad();
+}
+function leaveLite(){lite=false;aladinFailed=false;$('lite').hidden=true;$('aladin').hidden=false;}
+document.querySelectorAll('#lite-ctl button').forEach(b=>b.addEventListener('click',()=>{
+  const m=b.dataset.m;
+  if(m==='zi')liteMove(0,0,.5);else if(m==='zo')liteMove(0,0,2);
+  else if(m==='up')liteMove(0,.3);else if(m==='dn')liteMove(0,-.3);
+  else if(m==='lf')liteMove(.3,0);else if(m==='rt')liteMove(-.3,0);
+}));
+
+function getView(){
+  if(lite)return[L.ra,L.dec,L.fov];
+  if(!aladin)return null;
+  const[ra,dec]=aladin.getRaDec();return[ra,dec,aladin.getFoV()[0]];
+}
+function schedUrl(){
+  clearTimeout(urlT);
+  urlT=setTimeout(()=>{
+    const v=getView();if(!v)return;const[ra,dec,fov]=v;
+    $('p-live').textContent=`${ra.toFixed(3)}°, ${dec.toFixed(3)}° · ${fov.toFixed(2)}°`;
+    history.replaceState({},'',`${location.pathname}?obj=${EX[cur].id}&ra=${ra.toFixed(4)}&dec=${dec.toFixed(4)}&fov=${fov.toFixed(3)}&pair=${pairIdx}`);
+  },300);
+}
+function mixLabel(v){const p=PAIRS[pairIdx];$('badge').textContent=v===0?p.l1:v===1?p.l2:`Mezcla ${Math.round((1-v)*100)}% ${p.s1} / ${Math.round(v*100)}% ${p.s2}`;}
+function applyPair(i){
+  stopBlink();pairIdx=i;$('pair').value=i;
+  const v=parseFloat($('mix').value);
+  if(lite){liteLoad();mixLabel(v);return;}
+  if(!aladin)return;
+  aladin.setBaseImageLayer(PAIRS[i].base);setOverlay(PAIRS[i].over);
+  setOp(v);mixLabel(v);schedUrl();
+}
+function openRoom(i,ov){
+  cur=i;const e=EX[i];ov=ov||{};
+  const ra=ov.ra??e.ra,dec=ov.dec??e.dec,fov=ov.fov??e.fov,pr=ov.pair??e.pair;
+  $('p-sala').textContent=SALAS[e.sala];$('p-tipo').textContent=e.tipo;$('p-name').textContent=e.name;
+  $('p-text').textContent=e.text;
+  const dl=$('p-datos');dl.textContent='';
+  e.ficha.forEach(([k,v])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;dl.append(dt,dd);});
+  $('p-resumen').textContent=e.resumen;$('p-ref').textContent='Fuente: '+e.ref;
+  $('p-note').textContent='Nota: '+e.note;
+  $('p-ra').textContent=e.ra.toFixed(3)+'°';$('p-dec').textContent=e.dec.toFixed(3)+'°';
+  $('room').classList.add('open');document.body.style.overflow='hidden';
+  stopBlink();
+  if(aladinFailed){enterLite(ra,dec,fov,pr);return;}
+  initAladin(ra,dec,fov).then(()=>{
+    aladin.gotoRaDec(ra,dec);aladin.setFoV(fov);
+    $('mix').value=.5;applyPair(pr);
+  }).catch(()=>enterLite(ra,dec,fov,pr));
+}
+function closeRoom(){stopBlink();$('room').classList.remove('open');document.body.style.overflow='';history.replaceState({},'',location.pathname);}
+function go(d){openRoom((cur+d+EX.length)%EX.length);}
+function stopBlink(){if(!blinkT)return;clearInterval(blinkT);blinkT=null;$('blink').textContent='▶ Parpadeo (blink)';$('blink').classList.remove('on');}
+$('retry').onclick=()=>{leaveLite();openRoom(cur);};
+$('retry2').onclick=()=>{leaveLite();ready=null;openRoom(cur);};
+loadAladin().catch(()=>{}); // precarga
+
+$('close').onclick=closeRoom;$('prev').onclick=()=>go(-1);$('next').onclick=()=>go(1);
+$('pair').onchange=e=>applyPair(parseInt(e.target.value));
+$('mix').oninput=e=>{stopBlink();const v=parseFloat(e.target.value);setOp(v);mixLabel(v);};
+$('blink').onclick=()=>{
+  if(blinkT)return stopBlink();
+  $('blink').textContent='⏸ Detener parpadeo';$('blink').classList.add('on');
+  blinkT=setInterval(()=>{showOver=!showOver;setOp(showOver?1:0);$('badge').textContent=showOver?PAIRS[pairIdx].l2:PAIRS[pairIdx].l1;},700);
+};
+$('share').onclick=()=>{
+  clearTimeout(urlT);schedUrl();
+  setTimeout(async()=>{try{await navigator.clipboard.writeText(location.href);toast('Enlace copiado');}catch(e){prompt('Copia este enlace:',location.href);}},350);
+};
+addEventListener('keydown',k=>{
+  if(!$('room').classList.contains('open'))return;
+  if(k.key==='Escape')closeRoom();
+  if(k.key==='ArrowRight')go(1);
+  if(k.key==='ArrowLeft')go(-1);
+});
+
+/* Deep link: ?obj=barnard&ra=..&dec=..&fov=..&pair=.. */
+(function(){
+  const i=EX.findIndex(e=>e.id===q.get('obj'));
+  if(i<0)return;
+  const n=k=>{const v=parseFloat(q.get(k));return Number.isFinite(v)?v:undefined;};
+  const p=parseInt(q.get('pair'));
+  openRoom(i,{ra:n('ra'),dec:n('dec'),fov:n('fov'),pair:(p===0||p===1)?p:undefined});
+})();
+</script>
+</body>
+</html>
